@@ -1,3 +1,4 @@
+:- use_module(library(lists)).
 % Checks if a number is even
 even(X) :-
     0 is X mod 2.
