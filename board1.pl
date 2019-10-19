@@ -1,3 +1,5 @@
+:- use_module(library(ansi_term)).
+
 print_board([], Row) :-
     print_horizontalLine(Row).
 
@@ -65,37 +67,66 @@ print_verticalLine(Row,_):-
 
 print_verticalLine(_,_).
 
-print_cell([H|_T], 1, Col) :-
+print_cell([H|T], 1, Col) :-
     Col \= 1,
     Col \= 5,
     Col \= 10,
-    print_character(H, _T),
+    print_character(H, T),
     write(' ').
 
-print_cell([H|_T], 10, Col) :-
+print_cell([H|T], 10, Col) :-
     Col \= 5,
     Col \= 9,
     Col \= 10,
-    print_character(H, _T),
+    print_character(H, T),
     write(' ').
 
-print_cell([H|_T], _, _) :-
-    print_character(H, _T).
+print_cell([H|T], _, _) :-
+    print_character(H, T).
 
 print_character('T', [H|T]):-
     H == up,
-    write('X'),
-    write('/'),
-    write('X').
+    nth1(1,T,X),
+    getColor(X, C1),
+    nth1(2,T,Y),
+    getColor(Y, C2),
+    print_triangle_cell(9700, 9698, C1, C2).
 
 print_character('T', [H|T]):-
     H == dw,
-    write('X'),
-    write('\\'),
-    write('X').
+    nth1(1,T,X),
+    getColor(X, C1),
+    nth1(2,T,Y),
+    getColor(Y, C2),
+    print_triangle_cell(9699, 9701, C1, C2).
 
-print_character(C, [H|T]):-
+print_character('R', [_|T]):-
+    nth1(1,T,X),
+    getColor(X, C1),
+    print_square_cell(9632, C1).
+
+print_character('Q', [H|_]):-
+    getColor(H, C1),
+    print_square_cell(9632, C1).
+
+print_square_cell(Code1, Color1):-
     write(' '),
-    write(C),
+    ansi_format([fg(Color1)], '~c',[Code1]),
     write(' ').
+
+print_triangle_cell(Code1, Code2, Color1, Color2):-
+    ansi_format([fg(Color1)], '~c',[Code1]),
+    write(' '),
+    ansi_format([fg(Color2)], '~c',[Code2]).
+
+getColor(nill, Color):-
+    Color = black.
+
+getColor(p1, Color):-
+    Color = red.
+
+getColor(p2, Color):-
+    Color = blue.
+
+
 
