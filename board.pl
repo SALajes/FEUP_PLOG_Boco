@@ -128,7 +128,7 @@ print_triangle_cell(Code1, Code2, Color1, Color2) :-
     ansi_format([fg(Color2)], '~c', [Code2]).
 
 getColor(nill, Color) :-
-    Color=black.
+    Color=white.
 
 getColor(p1, Color) :-
     Color=red.
