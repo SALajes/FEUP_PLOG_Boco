@@ -12,5 +12,5 @@ display_game(Board, _Player) :-
 % Starts the game, printing an empty board
 % Need to provide the size of the map (rows and columns)
 play :-
-    initialBoard(Board),
+    bocoStructure(Board),
     display_game(Board, p1).

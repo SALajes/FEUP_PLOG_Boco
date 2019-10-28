@@ -93,28 +93,28 @@ print_cell([H|T], 10, Col) :-
 print_cell([H|T], _, _) :-
     print_character(H, T).
 
-print_character('T', [_,H|T]) :-
+print_character('T', [H|T]) :-
     H==up,
     nth1(1, T, X),
-    getColor(X, C1),
+    get_color(X, C1),
     nth1(2, T, Y),
-    getColor(Y, C2),
+    get_color(Y, C2),
     print_triangle_cell(9700, 9698, C1, C2).
 
-print_character('T', [_,H|T]) :-
+print_character('T', [H|T]) :-
     H==dw,
     nth1(1, T, X),
-    getColor(X, C1),
+    get_color(X, C1),
     nth1(2, T, Y),
-    getColor(Y, C2),
+    get_color(Y, C2),
     print_triangle_cell(9699, 9701, C1, C2).
 
 print_character('R', [_,H|_]) :-
-    getColor(H, C1),
+    get_color(H, C1),
     print_square_cell(9632, C1).
 
-print_character('Q', [_,H|_]) :-
-    getColor(H, C1),
+print_character('Q', [H|_]) :-
+    get_color(H, C1),
     print_square_cell(9632, C1).
 
 print_square_cell(Code1, Color1) :-
@@ -127,13 +127,13 @@ print_triangle_cell(Code1, Code2, Color1, Color2) :-
     write(' '),
     ansi_format([fg(Color2)], '~c', [Code2]).
 
-getColor(nill, Color) :-
+get_color(nill, Color) :-
     Color=white.
 
-getColor(p1, Color) :-
+get_color(p1, Color) :-
     Color=red.
 
-getColor(p2, Color) :-
+get_color(p2, Color) :-
     Color=blue.
 
 replace(_, _, [], []).
@@ -145,6 +145,7 @@ replace(X, Y, [H|T], [H|NT]) :-
     H\=X,
     replace(X, Y, T, NT).
 
+% Note that index starts at 0!
 replace_nth([_|T], 0, X, [X|T]).
 replace_nth([H|T], I, X, [H|R]):- 
     I > -1, 
@@ -152,54 +153,61 @@ replace_nth([H|T], I, X, [H|R]):-
     replace_nth(T, NI, X, R), !.
 replace_nth(L, _, _, L).
 
-getLine(Board, Row, Line) :-
+get_line(Board, Row, Line) :-
     nth1(Row, Board, Line).
 
-getCell(Board, Row, Column, Cell) :-
+get_cell(Board, Row, Column, Cell) :-
     nth1(Row, Board, Line),
     nth1(Column, Line, Cell).
 
-paintCell(Player, Cell, PaintedCell) :-
+paint_cell(Player, Cell, PaintedCell) :-
     nth1(1, Cell, Shape),
     Shape=='R',
-    nth1(3, Cell, Owner),
+    nth1(2, Cell, Owner),
     Owner==nill,
-    replace(nill, Player, Cell, PaintedCell).
+    % replace(nill, Player, Cell, PaintedCell).
+    replace_nth(Cell, 1, Player, PaintedCell).
     
-paintCell(Player, Cell, PaintedCell) :-
+paint_cell(Player, Cell, PaintedCell) :-
     nth1(1, Cell, Shape),
     Shape=='Q',
-    nth1(3, Cell, Owner),
+    nth1(2, Cell, Owner),
     Owner==nill,
-    replace(nill, Player, Cell, PaintedCell).
+    % replace(nill, Player, Cell, PaintedCell),
+    replace_nth(Cell, 1, Player, PaintedCell).
 
-paintCell(Player, Cell, Side, PaintedCell) :-
+paint_cell(Player, Cell, Side, PaintedCell) :-
     nth1(1, Cell, Shape),
     Shape=='T',
     Side==left,
+    nth1(3, Cell, Owner),
+    Owner==nill,
+    replace_nth(Cell, 2, Player, PaintedCell).
+
+paint_cell(Player, Cell, Side, PaintedCell) :-
+    nth1(1, Cell, Shape),
+    Shape=='T',
+    Side==right,
     nth1(4, Cell, Owner),
     Owner==nill,
     replace_nth(Cell, 3, Player, PaintedCell).
 
-paintCell(Player, Cell, Side, PaintedCell) :-
-    nth1(1, Cell, Shape),
-    Shape=='T',
-    Side==right,
-    nth1(5, Cell, Owner),
-    Owner==nill,
-    replace_nth(Cell, 4, Player, PaintedCell).
-
-makeMove(Player, Row, Column, Board, NewBoard) :-
-    getCell(Board, Row, Column, Cell),
-    paintCell(Player, Cell, PaintedCell),
-    getLine(Board, Row, Line),
-    replace(Cell, PaintedCell, Line, NewLine),
-    replace(Line, NewLine, Board, NewBoard).
+make_move(Player, Row, Column, Board, NewBoard) :-
+    get_cell(Board, Row, Column, Cell),
+    paint_cell(Player, Cell, PaintedCell),
+    get_line(Board, Row, Line),
+    replace_nth(Line, Column-1, PaintedCell, NewLine),
+    % replace(Cell, PaintedCell, Line, NewLine),
+    replace_nth(Board, Row-1, NewLine, NewBoard),
+    print_board(NewBoard, 1).
+    % replace(Line, NewLine, Board, NewBoard).
 
 % Side can be left or right (triangle)
-makeMove(Player, Row, Column, Side, Board, NewBoard) :-
-    getCell(Board, Row, Column, Cell),
-    paintCell(Player, Cell, Side, PaintedCell),
-    getLine(Board, Row, Line),
-    replace(Cell, PaintedCell, Line, NewLine),
-    replace(Line, NewLine, Board, NewBoard).
+make_move(Player, Row, Column, Side, Board, NewBoard) :-
+    get_cell(Board, Row, Column, Cell),
+    paint_cell(Player, Cell, Side, PaintedCell),
+    get_line(Board, Row, Line),
+    % replace(Cell, PaintedCell, Line, NewLine),
+    replace_nth(Line, Column-1, PaintedCell, NewLine),
+    % replace(Line, NewLine, Board, NewBoard).
+    replace_nth(Board, Row-1, NewLine, NewBoard).
