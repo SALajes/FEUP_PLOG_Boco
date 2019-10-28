@@ -136,15 +136,6 @@ get_color(p1, Color) :-
 get_color(p2, Color) :-
     Color=blue.
 
-replace(_, _, [], []).
-
-replace(X, Y, [X|T], [Y|NT]) :-
-    replace(X, Y, T, NT).
-
-replace(X, Y, [H|T], [H|NT]) :-
-    H\=X,
-    replace(X, Y, T, NT).
-
 % Note that index starts at 0!
 replace_nth([_|T], 0, X, [X|T]).
 replace_nth([H|T], I, X, [H|R]):- 
@@ -165,7 +156,6 @@ paint_cell(Player, Cell, PaintedCell) :-
     Shape=='R',
     nth1(2, Cell, Owner),
     Owner==nill,
-    % replace(nill, Player, Cell, PaintedCell).
     replace_nth(Cell, 1, Player, PaintedCell).
     
 paint_cell(Player, Cell, PaintedCell) :-
@@ -173,7 +163,6 @@ paint_cell(Player, Cell, PaintedCell) :-
     Shape=='Q',
     nth1(2, Cell, Owner),
     Owner==nill,
-    % replace(nill, Player, Cell, PaintedCell),
     replace_nth(Cell, 1, Player, PaintedCell).
 
 paint_cell(Player, Cell, Side, PaintedCell) :-
@@ -197,17 +186,13 @@ make_move(Player, Row, Column, Board, NewBoard) :-
     paint_cell(Player, Cell, PaintedCell),
     get_line(Board, Row, Line),
     replace_nth(Line, Column-1, PaintedCell, NewLine),
-    % replace(Cell, PaintedCell, Line, NewLine),
     replace_nth(Board, Row-1, NewLine, NewBoard),
     print_board(NewBoard, 1).
-    % replace(Line, NewLine, Board, NewBoard).
 
 % Side can be left or right (triangle)
 make_move(Player, Row, Column, Side, Board, NewBoard) :-
     get_cell(Board, Row, Column, Cell),
     paint_cell(Player, Cell, Side, PaintedCell),
     get_line(Board, Row, Line),
-    % replace(Cell, PaintedCell, Line, NewLine),
     replace_nth(Line, Column-1, PaintedCell, NewLine),
-    % replace(Line, NewLine, Board, NewBoard).
     replace_nth(Board, Row-1, NewLine, NewBoard).
