@@ -186,8 +186,10 @@ update_board(Player, Row, Column, Board, NewBoard) :-
     paint_cell(Player, Cell, PaintedCell),
     get_line(Board, Row, Line),
     % FIXME: Bug in the following line. For some reason, col=1 or line=1 is not painting in board
-    replace_nth(Line, Column-1, PaintedCell, NewLine),
-    replace_nth(Board, Row-1, NewLine, NewBoard),
+    DecrementedCol is Column-1,
+    replace_nth(Line, DecrementedCol, PaintedCell, NewLine),
+    DecrementedRow is Row-1,
+    replace_nth(Board, DecrementedRow, NewLine, NewBoard),
     print_board(NewBoard, 1).
 
 % Side can be left or right (triangle)
