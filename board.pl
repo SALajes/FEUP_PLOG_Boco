@@ -50,10 +50,10 @@ print_horizontalLine(Row) :-
     write('-----   ---------------------------------    ').
 
 print_verticalLine(10, 1) :-
-    write('|10 |').
+    write(' 10 |').
 
 print_verticalLine(Row, 1) :-
-    write('| '),
+    write('  '),
     write(Row),
     write(' |').
 
@@ -109,7 +109,7 @@ print_character('T', [H|T]) :-
     get_color(Y, C2),
     print_triangle_cell(9699, 9701, C1, C2).
 
-print_character('R', [_,H|_]) :-
+print_character('R', [_, H|_]) :-
     get_color(H, C1),
     print_square_cell(9632, C1).
 
@@ -138,9 +138,9 @@ get_color(p2, Color) :-
 
 % Note that index starts at 0!
 replace_nth([_|T], 0, X, [X|T]).
-replace_nth([H|T], I, X, [H|R]):- 
-    I > -1, 
-    NI is I-1, 
+replace_nth([H|T], I, X, [H|R]) :-
+    I> -1,
+    NI is I-1,
     replace_nth(T, NI, X, R), !.
 replace_nth(L, _, _, L).
 
@@ -154,9 +154,9 @@ get_cell(Board, Row, Column, Cell) :-
 paint_cell(Player, Cell, PaintedCell) :-
     nth1(1, Cell, Shape),
     Shape=='R',
-    nth1(2, Cell, Owner),
+    nth1(3, Cell, Owner),
     Owner==nill,
-    replace_nth(Cell, 1, Player, PaintedCell).
+    replace_nth(Cell, 2, Player, PaintedCell).
     
 paint_cell(Player, Cell, PaintedCell) :-
     nth1(1, Cell, Shape),
@@ -181,18 +181,41 @@ paint_cell(Player, Cell, Side, PaintedCell) :-
     Owner==nill,
     replace_nth(Cell, 3, Player, PaintedCell).
 
-make_move(Player, Row, Column, Board, NewBoard) :-
+update_board(Player, Row, Column, Board, NewBoard) :-
     get_cell(Board, Row, Column, Cell),
     paint_cell(Player, Cell, PaintedCell),
     get_line(Board, Row, Line),
+    % FIXME: Bug in the following line. For some reason, col=1 or line=1 is not painting in board
     replace_nth(Line, Column-1, PaintedCell, NewLine),
     replace_nth(Board, Row-1, NewLine, NewBoard),
     print_board(NewBoard, 1).
 
 % Side can be left or right (triangle)
-make_move(Player, Row, Column, Side, Board, NewBoard) :-
+update_board(Player, Row, Column, Side, Board, NewBoard) :-
     get_cell(Board, Row, Column, Cell),
     paint_cell(Player, Cell, Side, PaintedCell),
     get_line(Board, Row, Line),
     replace_nth(Line, Column-1, PaintedCell, NewLine),
     replace_nth(Board, Row-1, NewLine, NewBoard).
+
+is_triangle(Cell) :-
+    nth1(1, Cell, 'T').
+
+is_square(Cell) :-
+    nth1(1, Cell, 'Q').
+
+is_rectangle(Cell) :-
+    nth1(1, Cell, 'R').
+
+is_up_side(Char) :-
+    Char==u.
+
+is_down_side(Char) :-
+    Char==d.
+
+valid_side(u).
+valid_side(d).
+
+valid_coordinate(Coord) :-
+    Coord>=1,
+    Coord=<10.
