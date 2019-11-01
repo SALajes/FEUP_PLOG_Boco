@@ -1,24 +1,20 @@
 :- use_module(library(ansi_term)).
 :- use_module(library(lists)).
 :- include('internalstructure.pl').
-/**If the value of a side is u, then it's valid
- */
+%If the value of a side is u, then it's valid
 valid_side(u).
 
-/**If the value of a side is d, then it's valid
- */
+%If the value of a side is d, then it's valid
 valid_side(d).
 
-/**When the board is empty, prints the last line delimiter 
- * (the consecutive dashes "-----")
- */
+%When the board is empty, prints the last line delimiter 
+%(the consecutive dashes "-----")
 print_board([], Row) :-
     print_dashed_line(Row),
     nl.
 
-/**Depending on the value or Row, prints the respective dashed line and 
- * the line with the board contents
- */
+%Depending on the value or Row, prints the respective dashed line and 
+%the line with the board contents
 print_board([H|T], Row) :-
     print_dashed_line(Row),
     nl,
@@ -28,50 +24,43 @@ print_board([H|T], Row) :-
     Row2 is Row+1,
     print_board(T, Row2).
 
-/**When there are no more columns of the same line to print, 
- * prints the last vertical bar
- */
+%When there are no more columns of the same line to print, 
+%prints the last vertical bar
 print_row([], _, _) :-
     write('|').
 
-/**Depending on the Col of the same Row (Row is constant),  
- * prints the respective cell
- */
+%Depending on the Col of the same Row (Row is constant),  
+%prints the respective cell
 print_row([H|T], Row, Col) :-
     print_pipe(Row, Col),
     print_cell(H, Row, Col),
     Col2 is Col+1,
     print_row(T, Row, Col2).
 
-/**Prints the auxiliary column numbers of the board
- */
+%Prints the auxiliary column numbers of the board
 print_dashed_line(1) :-
     write('    | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |10 |'),
     nl,
     write(---------------------------------------------).
 
-/**Prints the dashed line that delimits the first and second
- * main board rows
- */
+%Prints the dashed line that delimits the first and second
+%main board rows
 print_dashed_line(2) :-
     write('-----   -------------------------------------').
 
-/**Prints the dashed line that delimits the nineth and tenth 
- * main board rows
- */
+%Prints the dashed line that delimits the nineth and tenth 
+%main board rows
 print_dashed_line(10) :-
     write('-----------------------------------------    ').
 
-/**Prints the full dashed line, characteristic of rows 6 and 11
- */
+%Prints the full dashed line, characteristic of rows 6 and 11
 print_dashed_line(Row) :-
     (   Row==6
     ;   Row==11
     ),
     write(---------------------------------------------).
 
-/**Prints an interrupted dashed line
- */
+%Prints an interrupted dashed line
 print_dashed_line(Row) :-
     Row\=1,
     Row\=2,
@@ -80,48 +69,41 @@ print_dashed_line(Row) :-
     Row\=11,
     write('-----   ---------------------------------    ').
 
-/**Prints the beggining of the tenth row (the line number and the first pipe)
- */
+%Prints the beggining of the tenth row (the line number and the first pipe)
 print_pipe(10, 1) :-
     write(' 10 |').
 
-/**Prints the beggining of each row (the line number and the first pipe)
- */
+%Prints the beggining of each row (the line number and the first pipe)
 print_pipe(Row, 1) :-
     write('  '),
     write(Row),
     write(' |').
 
-/**Prints the pipes of the first row, on columns 2 and 6
- */
+%Prints the pipes of the first row, on columns 2 and 6
 print_pipe(1, Col) :-
     (   Col==2
     ;   Col==6
     ),
     write('|').
 
-/**Prints the pipes of the tenth row, on columns 6 and 10
- */
+%Prints the pipes of the tenth row, on columns 6 and 10
 print_pipe(10, Col) :-
     (   Col==6
     ;   Col==10
     ),
     write('|').
 
-/**Prints the pipes of the rest of the rows
- */
+%Prints the pipes of the rest of the rows
 print_pipe(Row, _) :-
     Row\=1,
     Row\=10,
     write('|').
 
-/**Stops when all pipes have been written
- */
+%Stops when all pipes have been written
 print_pipe(_, _).
 
-/**Prints the corresponding character of a cell, 
- * on row 1
- */
+%Prints the corresponding character of a cell, 
+%on row 1
 print_cell([H|T], 1, Col) :-
     Col\=1,
     Col\=5,
@@ -129,9 +111,8 @@ print_cell([H|T], 1, Col) :-
     print_character(H, T),
     write(' ').
 
-/**Prints the corresponding character of a cell,
- * on row 10
- */
+%Prints the corresponding character of a cell,
+%on row 10
 print_cell([H|T], 10, Col) :-
     Col\=5,
     Col\=9,
@@ -139,14 +120,12 @@ print_cell([H|T], 10, Col) :-
     print_character(H, T),
     write(' ').
 
-/**Prints the remaining characters of a row
- */
+%Prints the remaining characters of a row
 print_cell([H|T], _, _) :-
     print_character(H, T).
 
-/**If a cell is a triangle, then it paints it with the color 
- * of the player that picked it (up in this case)
- */
+%If a cell is a triangle, then it paints it with the color 
+%of the player that picked it (up in this case)
 print_character('T', [H|T]) :-
     H==up,
     nth1(1, T, X),
@@ -155,9 +134,8 @@ print_character('T', [H|T]) :-
     get_color(Y, C2),
     print_triangle_cell(9700, 9698, C1, C2).
 
-/**If a cell is a triangle, then it paints it with the color 
- * of the player that picked it (down in this case)
- */
+%If a cell is a triangle, then it paints it with the color 
+%of the player that picked it (down in this case)
 print_character('T', [H|T]) :-
     H==dw,
     nth1(1, T, X),
@@ -166,88 +144,77 @@ print_character('T', [H|T]) :-
     get_color(Y, C2),
     print_triangle_cell(9699, 9701, C1, C2).
 
-/**If a cell is a rectangle, then it paints it with the color 
- * of the player that picked it
- */
+%If a cell is a rectangle, then it paints it with the color 
+%of the player that picked it
 print_character('R', [_, H|_]) :-
     get_color(H, C1),
     print_square_cell(9632, C1).
 
-/**If a cell is a square, then it paints it with the color 
- * of the player that picked it
- */
+%If a cell is a square, then it paints it with the color 
+%of the player that picked it
 print_character('Q', [H|_]) :-
     get_color(H, C1),
     print_square_cell(9632, C1).
 
-/**Paints a square cell with its corresponding color
- */
+%Paints a square cell with its corresponding color
 print_square_cell(Code1, Color1) :-
     write(' '),
     ansi_format([fg(Color1)], '~c', [Code1]),
     write(' ').
 
-/**Paints a triangle cell with its corresponding color 
- * and selected side
- */
+%Paints a triangle cell with its corresponding color 
+%and selected side
 print_triangle_cell(Code1, Code2, Color1, Color2) :-
     ansi_format([fg(Color1)], '~c', [Code1]),
     write(' '),
     ansi_format([fg(Color2)], '~c', [Code2]).
 
-/**Sets free cells' color as white
- */
+%Sets free cells' color as white
 get_color(nill, Color) :-
     Color=white.
-/**Sets player 1's color as red
- */
+%Sets player 1's color as red
 get_color(p1, Color) :-
     Color=red.
 
-/**Sets player 2's color as blue
- */
+%Sets player 2's color as blue
 get_color(p2, Color) :-
     Color=blue.
 
-/**Replaces an element of a list. If the index 
- * of the element to be replaced is 0 (the first 
- * element of the list), then the resulting list is 
- * element X appended to the rest of the list (and 
- * excluding the element in index 0 of the original list).
- * Note that indexes in this predicate star at 0! 
- */
+%Replaces an element of a list. If the index 
+%of the element to be replaced is 0 (the first 
+%element of the list), then the resulting list is 
+%element X appended to the rest of the list (and 
+%excluding the element in index 0 of the original list).
+%Note that indexes in this predicate star at 0! 
+
 replace_nth([_|T], 0, X, [X|T]).
-/**Replaces an element of a list. If the index of the 
- * current element is not zero (the index is decreased until 
- * the element is found - in this case, the index would be 0),
- * then the predicate recursively calls itself again with the 
- * same list, but excluding its head.
- * Note that indexes in this predicate star at 0! 
- */
+%Replaces an element of a list. If the index of the 
+%current element is not zero (the index is decreased until 
+%the element is found - in this case, the index would be 0),
+%then the predicate recursively calls itself again with the 
+%same list, but excluding its head.
+%Note that indexes in this predicate star at 0! 
 replace_nth([H|T], I, X, [H|R]) :-
     I> -1,
     NI is I-1,
     replace_nth(T, NI, X, R), !.
-/**If the element doesn't exist, it returns the original list
- */
+
+%If the element doesn't exist, it returns the original list
 replace_nth(L, _, _, L).
 
-/**Iterates the board and gets the line 
- * with index=Row
- */
+%Iterates the board and gets the line 
+%with index=Row
 get_line(Board, Row, Line) :-
     nth1(Row, Board, Line).
 
-/**Iterates the board and the line with index=Row where the cell 
- * is located, and gets the cell in column=Column
- */
+%Iterates the board and the line with index=Row where the cell 
+%is located, and gets the cell in column=Column
 get_cell(Board, Row, Column, Cell) :-
     nth1(Row, Board, Line),
     nth1(Column, Line, Cell).
 
-/**Paints a rectangle cell by replacing its information with 
- * the player that selected it 
- */
+%Paints a rectangle cell by replacing its information with 
+%the player that selected it 
 paint_cell(Player, Cell, PaintedCell) :-
     nth1(1, Cell, Shape),
     Shape=='R',
@@ -255,9 +222,8 @@ paint_cell(Player, Cell, PaintedCell) :-
     Owner==nill,
     replace_nth(Cell, 2, Player, PaintedCell).
     
-/**Paints a square cell by replacing its information with 
- * the player that selected it 
- */
+%Paints a square cell by replacing its information with 
+%the player that selected it 
 paint_cell(Player, Cell, PaintedCell) :-
     nth1(1, Cell, Shape),
     Shape=='Q',
@@ -265,9 +231,8 @@ paint_cell(Player, Cell, PaintedCell) :-
     Owner==nill,
     replace_nth(Cell, 1, Player, PaintedCell).
 
-/**Paints a left triangle cell by replacing its information with 
- * the player that selected it and the side of the triangle selected 
- */
+%Paints a left triangle cell by replacing its information with 
+%the player that selected it and the side of the triangle selected 
 paint_cell(Player, Cell, Side, PaintedCell) :-
     nth1(1, Cell, Shape),
     Shape=='T',
@@ -276,9 +241,8 @@ paint_cell(Player, Cell, Side, PaintedCell) :-
     Owner==nill,
     replace_nth(Cell, 2, Player, PaintedCell).
 
-/**Paints a right triangle cell by replacing its information with 
- * the player that selected it and the side of the triangle selected 
- */
+%Paints a right triangle cell by replacing its information with 
+%the player that selected it and the side of the triangle selected 
 paint_cell(Player, Cell, Side, PaintedCell) :-
     nth1(1, Cell, Shape),
     Shape=='T',
@@ -287,12 +251,10 @@ paint_cell(Player, Cell, Side, PaintedCell) :-
     Owner==nill,
     replace_nth(Cell, 3, Player, PaintedCell).
 
-/**
- * Updates the board by painting the cell existing in
- * row=Row and column=Column.
- * Note that the cell is not supposed to be a triangle.
- * Prints the board when all replacements are done
- */
+%Updates the board by painting the cell existing in
+%row=Row and column=Column.
+%Note that the cell is not supposed to be a triangle.
+%Prints the board when all replacements are done
 update_board(Player, Row, Column, Board, NewBoard) :-
     get_cell(Board, Row, Column, Cell),
     paint_cell(Player, Cell, PaintedCell),
@@ -303,14 +265,12 @@ update_board(Player, Row, Column, Board, NewBoard) :-
     replace_nth(Board, DecrementedRow, NewLine, NewBoard),
     print_board(NewBoard, 1).
 
-/**
- * Updates the board by painting the cell existing in
- * row=Row and column=Column.
- * Note that the cell is supposed to be a triangle, as the 
- * predicate receives a Side as parameter. The side can 
- * either be left or right
- * Prints the board when all replacements are done
- */
+%Updates the board by painting the cell existing in
+%row=Row and column=Column.
+%Note that the cell is supposed to be a triangle, as the 
+%predicate receives a Side as parameter. The side can 
+%either be left or right
+%Prints the board when all replacements are done
 update_board(Player, Row, Column, Side, Board, NewBoard) :-
     get_cell(Board, Row, Column, Cell),
     paint_cell(Player, Cell, Side, PaintedCell),
@@ -318,36 +278,30 @@ update_board(Player, Row, Column, Side, Board, NewBoard) :-
     replace_nth(Line, Column-1, PaintedCell, NewLine),
     replace_nth(Board, Row-1, NewLine, NewBoard).
 
-/**The cell is a triangle if the first element of the cell
- * if an T
- */
+%The cell is a triangle if the first element of the cell
+%if an T
 is_triangle(Cell) :-
     nth1(1, Cell, 'T').
 
-/**The cell is a square if the first element of the cell
- * if an Q
- */
+%The cell is a square if the first element of the cell
+%if an Q
 is_square(Cell) :-
     nth1(1, Cell, 'Q').
 
-/**The cell is a rectangle if the first element of the cell
- * if an R
- */
+%The cell is a rectangle if the first element of the cell
+%if an R
 is_rectangle(Cell) :-
     nth1(1, Cell, 'R').
 
-/**The side is up if the atom has value u
- */
+%The side is up if the atom has value u
 is_up_side(Char) :-
     Char==u.
-/**The side is down if the atom has value d
- */
+%The side is down if the atom has value d
 is_down_side(Char) :-
     Char==d.
 
-/**Coordinate is valid if its value is between 1 and 10 
- * (including both)
- */
+%Coordinate is valid if its value is between 1 and 10 
+%(including both)
 valid_coordinate(Coord) :-
     Coord>=1,
     Coord=<10.
