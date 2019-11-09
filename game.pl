@@ -46,7 +46,6 @@ execute_play(Board) :-
     ite(valid_side(Side),
         update_board(p1, Row, Column, Side, Board, NewBoard),
         update_board(p1, Row, Column, Board, NewBoard)),
-    display_game(NewBoard),
     execute_play(NewBoard).
 
 %Prints the initial, empty board and then 

@@ -271,7 +271,8 @@ update_board(Player, Row, Column, Side, Board, NewBoard) :-
     paint_cell(Player, Cell, Side, PaintedCell),
     get_line(Board, Row, Line),
     replace_nth(Line, Column-1, PaintedCell, NewLine),
-    replace_nth(Board, Row-1, NewLine, NewBoard).
+    replace_nth(Board, Row-1, NewLine, NewBoard),
+    print_board(NewBoard, 1).
 
 %The cell is a triangle if the first element of the cell
 %if an T
