@@ -185,7 +185,6 @@ update_board(Player, Row, Column, Board, NewBoard) :-
     get_cell(Board, Row, Column, Cell),
     paint_cell(Player, Cell, PaintedCell),
     get_line(Board, Row, Line),
-    % FIXME: Bug in the following line. For some reason, col=1 or line=1 is not painting in board
     DecrementedCol is Column-1,
     replace_nth(Line, DecrementedCol, PaintedCell, NewLine),
     DecrementedRow is Row-1,
@@ -210,13 +209,13 @@ is_rectangle(Cell) :-
     nth1(1, Cell, 'R').
 
 is_up_side(Char) :-
-    Char==u.
+    Char==left.
 
 is_down_side(Char) :-
-    Char==d.
+    Char==right.
 
-valid_side(u).
-valid_side(d).
+valid_side(Side) :-
+    Side==left; Side==right.
 
 valid_coordinate(Coord) :-
     Coord>=1,
