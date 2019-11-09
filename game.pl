@@ -30,7 +30,8 @@ ask_triangle_side(Side) :-
 
 %Writes text asking for row, column and possibly side
 %of triangle, it it's the cell that the user picked
-ask_move(Board, [Row, Column, Side]) :-
+ask_move(Board, [Row, Column, Side], Player) :-
+    ite(Player==p1, writeln("Player 1's turn"), writeln("Player 2's turn")),
     writeln("Insert the row number: "),
     process_coordinate(Row),
     writeln("Insert the column number: "),
@@ -41,16 +42,17 @@ ask_move(Board, [Row, Column, Side]) :-
 %Asks the player for a move, and then updates the board 
 %depending if the selected cell is a triangle or not.
 %After that, repeats.
-execute_play(Board) :-
-    ask_move(Board, [Row, Column, Side]),
+execute_play(Board, Player) :-
+    ask_move(Board, [Row, Column, Side], Player),
     ite(valid_side(Side),
-        update_board(p1, Row, Column, Side, Board, NewBoard),
-        update_board(p1, Row, Column, Board, NewBoard)),
-    execute_play(NewBoard).
+        update_board(Player, Row, Column, Side, Board, NewBoard),
+        update_board(Player, Row, Column, Board, NewBoard)),
+    ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
+    execute_play(NewBoard, NewPlayer).
 
 %Prints the initial, empty board and then 
 %executes a play
 play :-
     bocoStructure(Board),
     display_game(Board),
-    execute_play(Board).
+    execute_play(Board, p1).
