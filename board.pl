@@ -182,7 +182,6 @@ get_color(p2, Color) :-
 %element X appended to the rest of the list (and 
 %excluding the element in index 0 of the original list).
 %Note that indexes in this predicate star at 0! 
-
 replace_nth([_|T], 0, X, [X|T]).
 %Replaces an element of a list. If the index of the 
 %current element is not zero (the index is decreased until 
@@ -273,7 +272,7 @@ update_board_single(Player, Row, Column, Side, Board, NewBoard) :-
     replace_nth(Line, Column-1, PaintedCell, NewLine),
     replace_nth(Board, Row-1, NewLine, NewBoard).
 
-update_board_multiple(Player, List, Board, NewBoard) :- 
+update_board_multiple(Player, List, Board, NewBoard) :-
     update(Player, List, Board, NewBoard).
 
 update(_, [], Board, Board).
@@ -307,27 +306,30 @@ is_down_side(Char) :-
 
 %A side is valid if its value is either left or right
 valid_side(Side) :-
-    Side==left; Side==right.
+    (   Side==left
+    ;   Side==right
+    ).
 
 valid_coordinate(Coord) :-
     Coord>=1,
     Coord=<10.
 
-rect1squares([[1,2],[1,3],[1,4],[1,5]]).
-rect2squares([[1,6],[1,7],[1,8],[1,9],[1,10]]).
-rect3squares([[2,10],[3,10],[4,10],[5,10]]).
-rect4squares([[6,10],[7,10],[8,10],[9,10],[10,10]]).
-rect5squares([[10,9],[10,8],[10,7],[10,6]]).
-rect6squares([[10,5],[10,4],[10,3],[10,2],[10,1]]).
-rect7squares([[9,1],[8,1],[7,1],[6,1]]).
-rect8squares([[5,1],[4,1],[3,1],[2,1],[1,1]]).
+rect1squares([[1, 2], [1, 3], [1, 4], [1, 5]]).
+rect2squares([[1, 6], [1, 7], [1, 8], [1, 9], [1, 10]]).
+rect3squares([[2, 10], [3, 10], [4, 10], [5, 10]]).
+rect4squares([[6, 10], [7, 10], [8, 10], [9, 10], [10, 10]]).
+rect5squares([[10, 9], [10, 8], [10, 7], [10, 6]]).
+rect6squares([[10, 5], [10, 4], [10, 3], [10, 2], [10, 1]]).
+rect7squares([[9, 1], [8, 1], [7, 1], [6, 1]]).
+rect8squares([[5, 1], [4, 1], [3, 1], [2, 1], [1, 1]]).
 
 get_rect_square_list(Id, List) :-
-    it(Id is 1, rect1squares(List)), !;
-    it(Id is 2, rect2squares(List)), !;
-    it(Id is 3, rect3squares(List)), !;
-    it(Id is 4, rect4squares(List)), !;
-    it(Id is 5, rect5squares(List)), !;
-    it(Id is 6, rect6squares(List)), !;
-    it(Id is 7, rect7squares(List)), !;
-    it(Id is 8, rect8squares(List)), !.
+    (   it(Id is 1, rect1squares(List)), !
+    ;   it(Id is 2, rect2squares(List)), !
+    ;   it(Id is 3, rect3squares(List)), !
+    ;   it(Id is 4, rect4squares(List)), !
+    ;   it(Id is 5, rect5squares(List)), !
+    ;   it(Id is 6, rect6squares(List)), !
+    ;   it(Id is 7, rect7squares(List)), !
+    ;   it(Id is 8, rect8squares(List)), !
+    ).

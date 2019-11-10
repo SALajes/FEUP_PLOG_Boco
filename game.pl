@@ -45,25 +45,31 @@ execute_play(Board, Player) :-
     ask_move(Board, [Row, Column, Side], Player),
     get_cell(Board, Row, Column, Cell),
     ite(is_rectangle(Cell, Id),
-       get_rect_square_list(Id, List), 
-       !),
-    ite(valid_side(Side), update_board_single(Player, Row, Column, Side, Board, NewBoard), check_single(Cell, Id, Player, List, Board, NewBoard, Row, Column)),
+        get_rect_square_list(Id, List),
+        !),
+    ite(valid_side(Side),
+        update_board_single(Player,
+                            Row,
+                            Column,
+                            Side,
+                            Board,
+                            NewBoard),
+        check_single(Cell,
+                     Id,
+                     Player,
+                     List,
+                     Board,
+                     NewBoard,
+                     Row,
+                     Column)),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
     execute_play(NewBoard, NewPlayer).
 
 check_single(Cell, Id, Player, List, Board, NewBoard, Row, Column) :-
     ite(is_rectangle(Cell, Id),
-        update_board_multiple(Player,
-                              List,
-                              Board,
-                              NewBoard),
-        update_board_single(Player,
-                            Row,
-                            Column,
-                            Board,
-                            NewBoard)
-    ).
+        update_board_multiple(Player, List, Board, NewBoard),
+        update_board_single(Player, Row, Column, Board, NewBoard)).
 
 %Prints the initial, empty board and then 
 %executes a play
