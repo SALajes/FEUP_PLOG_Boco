@@ -1,6 +1,7 @@
 :- use_module(library(ansi_term)).
 :- use_module(library(lists)).
 :- include('internalstructure.pl').
+:- include('utilities.pl').
 
 %When the board is empty, prints the last line delimiter 
 %(the consecutive dashes "-----")
@@ -250,15 +251,14 @@ paint_cell(Player, Cell, Side, PaintedCell) :-
 %row=Row and column=Column.
 %Note that the cell is not supposed to be a triangle.
 %Prints the board when all replacements are done
-update_board(Player, Row, Column, Board, NewBoard) :-
+update_board_single(Player, Row, Column, Board, NewBoard) :-
     get_cell(Board, Row, Column, Cell),
     paint_cell(Player, Cell, PaintedCell),
     get_line(Board, Row, Line),
     DecrementedCol is Column-1,
     replace_nth(Line, DecrementedCol, PaintedCell, NewLine),
     DecrementedRow is Row-1,
-    replace_nth(Board, DecrementedRow, NewLine, NewBoard),
-    print_board(NewBoard, 1).
+    replace_nth(Board, DecrementedRow, NewLine, NewBoard).
 
 %Updates the board by painting the cell existing in
 %row=Row and column=Column.
@@ -266,13 +266,21 @@ update_board(Player, Row, Column, Board, NewBoard) :-
 %predicate receives a Side as parameter. The side can 
 %either be left or right
 %Prints the board when all replacements are done
-update_board(Player, Row, Column, Side, Board, NewBoard) :-
+update_board_single(Player, Row, Column, Side, Board, NewBoard) :-
     get_cell(Board, Row, Column, Cell),
     paint_cell(Player, Cell, Side, PaintedCell),
     get_line(Board, Row, Line),
     replace_nth(Line, Column-1, PaintedCell, NewLine),
-    replace_nth(Board, Row-1, NewLine, NewBoard),
-    print_board(NewBoard, 1).
+    replace_nth(Board, Row-1, NewLine, NewBoard).
+
+update_board_multiple(Player, List, Board, NewBoard) :- 
+    update(Player, List, Board, NewBoard).
+
+update(_, [], Board, Board).
+
+update(Player, [[Row, Column]|T], Board, FinalBoard) :-
+    update_board_single(Player, Row, Column, Board, NewBoard),
+    update_board_multiple(Player, T, NewBoard, FinalBoard).
 
 %The cell is a triangle if the first element of the cell
 %if an T
@@ -286,8 +294,9 @@ is_square(Cell) :-
 
 %The cell is a rectangle if the first element of the cell
 %if an R
-is_rectangle(Cell) :-
-    nth1(1, Cell, 'R').
+is_rectangle(Cell, Id) :-
+    nth1(1, Cell, 'R'),
+    nth1(2, Cell, Id).
 
 %The side is left if the atom has value left
 is_up_side(Char) :-
@@ -303,3 +312,22 @@ valid_side(Side) :-
 valid_coordinate(Coord) :-
     Coord>=1,
     Coord=<10.
+
+rect1squares([[1,2],[1,3],[1,4],[1,5]]).
+rect2squares([[1,6],[1,7],[1,8],[1,9],[1,10]]).
+rect3squares([[2,10],[3,10],[4,10],[5,10]]).
+rect4squares([[6,10],[7,10],[8,10],[9,10],[10,10]]).
+rect5squares([[10,9],[10,8],[10,7],[10,6]]).
+rect6squares([[10,5],[10,4],[10,3],[10,2],[10,1]]).
+rect7squares([[9,1],[8,1],[7,1],[6,1]]).
+rect8squares([[5,1],[4,1],[3,1],[2,1],[1,1]]).
+
+get_rect_square_list(Id, List) :-
+    it(Id is 1, rect1squares(List)), !;
+    it(Id is 2, rect2squares(List)), !;
+    it(Id is 3, rect3squares(List)), !;
+    it(Id is 4, rect4squares(List)), !;
+    it(Id is 5, rect5squares(List)), !;
+    it(Id is 6, rect6squares(List)), !;
+    it(Id is 7, rect7squares(List)), !;
+    it(Id is 8, rect8squares(List)), !.
