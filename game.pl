@@ -130,7 +130,7 @@ check_above(Board, Row, Column) :-
     nth1(1, Cell, 'R'),
     get_cell(Board, NewRow, Column, AboveCell),
     nth1(1, AboveCell, 'R'),
-    \+cell_empty(Board, NewRow, Column).
+    \+ cell_empty(Board, NewRow, Column).
 
 check_above(Board, Row, Column) :-
     NewRow is Row-1,
@@ -189,7 +189,7 @@ check_below(Board, Row, Column) :-
     nth1(1, Cell, 'R'),
     get_cell(Board, NewRow, Column, BelowCell),
     nth1(1, BelowCell, 'R'),
-    \+cell_empty(Board, NewRow, Column).
+    \+ cell_empty(Board, NewRow, Column).
 
 check_left(Board, Row, Column, Side) :-
     NewColumn is Column-1,
@@ -268,6 +268,16 @@ check_single(Cell, Id, Player, List, Board, NewBoard, Row, Column) :-
     ite(is_rectangle(Cell, Id),
         update_board_multiple(Player, List, Board, NewBoard),
         update_board_single(Player, Row, Column, Board, NewBoard)).
+
+valid_moves(Board, ListOfMoves) :-
+    aux_valid_moves(Board, [], ListOfMoves, 1).
+
+aux_valid_moves(_, AuxList, [AuxList|_], 11).
+
+aux_valid_moves(Board, AuxList, ListOfMoves, Row) :-
+    NewRow is Row+1,
+    findall(X-Y, valid_cell(Board, X, Y), AuxList),
+    aux_valid_moves(Board, AuxList, ListOfMoves, NewRow).
 
 %Prints the initial, empty board and then 
 %executes a play

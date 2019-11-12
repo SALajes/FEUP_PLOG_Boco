@@ -311,8 +311,7 @@ valid_side(Side) :-
     ).
 
 valid_coordinate(Coord) :-
-    Coord>=1,
-    Coord=<10.
+    between(1, 10, Coord).
 
 rect1squares([[1, 2], [1, 3], [1, 4], [1, 5]]).
 rect2squares([[1, 6], [1, 7], [1, 8], [1, 9], [1, 10]]).
