@@ -90,7 +90,40 @@ cell_empty(Board, Row, Column, Side) :-
     ;   Side==right,
         nth1(4, Cell, nill)
     ).
+
+cell_occupied(Board, Row, Column) :-
+    valid_coordinate(Row),
+    valid_coordinate(Column),
+    get_cell(Board, Row, Column, Cell), !,
+    nth1(1, Cell, 'R'),
+    (   nth1(3, Cell, p1)
+    ;   nth1(3, Cell, p2)
+    ).
     
+cell_occupied(Board, Row, Column) :-
+    valid_coordinate(Row),
+    valid_coordinate(Column),
+    get_cell(Board, Row, Column, Cell), !,
+    nth1(1, Cell, 'Q'),
+    (   nth1(2, Cell, p1)
+    ;   nth1(2, Cell, p2)
+    ).
+
+cell_occupied(Board, Row, Column, Side) :-
+    valid_coordinate(Row),
+    valid_coordinate(Column),
+    get_cell(Board, Row, Column, Cell),
+    nth1(1, Cell, 'T'), !,
+    (   Side==left,
+        (   nth1(3, Cell, p1)
+        ;   nth1(3, Cell, p2)
+        )
+    ;   Side==right,
+        (   nth1(4, Cell, p1)
+        ;   nth1(4, Cell, p2)
+        )
+    ).
+
 %When a triangle is of type 'up', checks if the cell above Cell is
 %valid to be selected.
 check_above(Board, Row, Column, Side) :-
@@ -98,18 +131,34 @@ check_above(Board, Row, Column, Side) :-
     valid_coordinate(NewRow),
     get_cell(Board, Row, Column, Cell),
     nth1(2, Cell, up),
-    ite(Side==right,
-        \+cell_empty(Board, Row, Column, left),
-        it(Side==left, \+cell_empty(Board, NewRow, Column))).
+    Side==right,
+    !,
+    cell_occupied(Board, Row, Column, left).
+
+check_above(Board, Row, Column, Side) :-
+    NewRow is Row-1,
+    valid_coordinate(NewRow),
+    get_cell(Board, Row, Column, Cell),
+    nth1(2, Cell, up),
+    !,
+    cell_occupied(Board, NewRow, Column).
 
 check_above(Board, Row, Column, Side) :-
     NewRow is Row-1,
     valid_coordinate(NewRow),
     get_cell(Board, Row, Column, Cell),
     nth1(2, Cell, dw),
-    ite(Side==right,
-        \+cell_empty(Board, NewRow, Column),
-        it(Side==left, \+cell_empty(Board, Row, Column, right))).
+    Side==right,
+    !,
+    cell_occupied(Board, NewRow, Column).
+
+check_above(Board, Row, Column, Side) :-
+    NewRow is Row-1,
+    valid_coordinate(NewRow),
+    get_cell(Board, Row, Column, Cell),
+    nth1(2, Cell, dw),
+    !,
+    cell_occupied(Board, Row, Column, right).
 
 check_above(Board, Row, Column) :-
     NewRow is Row-1,
@@ -117,11 +166,28 @@ check_above(Board, Row, Column) :-
     get_cell(Board, Row, Column, Cell),
     nth1(1, Cell, 'Q'),
     get_cell(Board, NewRow, Column, AboveCell),
-    ite(nth1(1, AboveCell, 'R'),
-        \+cell_empty(Board, NewRow, Column),
-        ite(nth1(2, AboveCell, up),
-            \+cell_empty(Board, NewRow, Column, right),
-            \+cell_empty(Board, NewRow, Column, left))).
+    nth1(1, AboveCell, 'R'),
+    !,
+    cell_occupied(Board, NewRow, Column).
+
+check_above(Board, Row, Column) :-
+    NewRow is Row-1,
+    valid_coordinate(NewRow),
+    get_cell(Board, Row, Column, Cell),
+    nth1(1, Cell, 'Q'),
+    get_cell(Board, NewRow, Column, AboveCell),
+    nth1(2, AboveCell, up),
+    !,
+    cell_occupied(Board, NewRow, Column, right).
+
+check_above(Board, Row, Column) :-
+    NewRow is Row-1,
+    valid_coordinate(NewRow),
+    get_cell(Board, Row, Column, Cell),
+    nth1(1, Cell, 'Q'),
+    get_cell(Board, NewRow, Column, AboveCell),
+    !,
+    cell_occupied(Board, NewRow, Column, left).
 
 check_above(Board, Row, Column) :-
     NewRow is Row-1,
@@ -130,7 +196,8 @@ check_above(Board, Row, Column) :-
     nth1(1, Cell, 'R'),
     get_cell(Board, NewRow, Column, AboveCell),
     nth1(1, AboveCell, 'R'),
-    \+ cell_empty(Board, NewRow, Column).
+    !,
+    cell_occupied(Board, NewRow, Column).
 
 check_above(Board, Row, Column) :-
     NewRow is Row-1,
@@ -138,27 +205,53 @@ check_above(Board, Row, Column) :-
     get_cell(Board, Row, Column, Cell),
     nth1(1, Cell, 'R'),
     get_cell(Board, NewRow, Column, AboveCell),
-    ite(nth1(1, AboveCell, 'Q'),
-        \+cell_empty(Board, NewRow, Column),
-        \+cell_empty(Board, NewRow, Column, right)).
+    nth1(1, AboveCell, 'Q'),
+    !,
+    cell_occupied(Board, NewRow, Column).
+
+check_above(Board, Row, Column) :-
+    NewRow is Row-1,
+    valid_coordinate(NewRow),
+    get_cell(Board, Row, Column, Cell),
+    nth1(1, Cell, 'R'),
+    get_cell(Board, NewRow, Column, AboveCell),
+    !,
+    cell_occupied(Board, NewRow, Column, right).
 
 check_below(Board, Row, Column, Side) :-
     NewRow is Row+1,
     valid_coordinate(NewRow),
     get_cell(Board, Row, Column, Cell),
     nth1(2, Cell, up),
-    ite(Side==right,
-        \+cell_empty(Board, NewRow, Column),
-        it(Side==left, \+cell_empty(Board, Row, Column, right))).
+    Side==right,
+    !,
+    cell_occupied(Board, NewRow, Column).
+
+check_below(Board, Row, Column, Side) :-
+    NewRow is Row+1,
+    valid_coordinate(NewRow),
+    get_cell(Board, Row, Column, Cell),
+    nth1(2, Cell, up),
+    !,
+    cell_empty(Board, Row, Column, right).
 
 check_below(Board, Row, Column, Side) :-
     NewRow is Row+1,
     valid_coordinate(NewRow),
     get_cell(Board, Row, Column, Cell),
     nth1(2, Cell, dw),
-    ite(Side==right,
-        \+cell_empty(Board, NewRow, Column, left),
-        it(Side==left, \+cell_empty(Board, Row, Column))).
+    Side==right,
+    !,
+    cell_occupied(Board, NewRow, Column, left).
+
+check_below(Board, Row, Column, Side) :-
+    NewRow is Row+1,
+    valid_coordinate(NewRow),
+    get_cell(Board, Row, Column, Cell),
+    nth1(2, Cell, dw),
+    Side==right,
+    !,
+    cell_empty(Board, Row, Column).
 
 check_below(Board, Row, Column) :-
     NewRow is Row+1,
@@ -166,11 +259,28 @@ check_below(Board, Row, Column) :-
     get_cell(Board, Row, Column, Cell),
     nth1(1, Cell, 'Q'),
     get_cell(Board, NewRow, Column, BelowCell),
-    ite(nth1(1, BelowCell, 'R'),
-        \+cell_empty(Board, NewRow, Column),
-        ite(nth1(2, BelowCell, up),
-            \+cell_empty(Board, NewRow, Column, left),
-            \+cell_empty(Board, NewRow, Column, right))).
+    nth1(1, BelowCell, 'R'),
+    !,
+    cell_occupied(Board, NewRow, Column).
+
+check_below(Board, Row, Column) :-
+    NewRow is Row+1,
+    valid_coordinate(NewRow),
+    get_cell(Board, Row, Column, Cell),
+    nth1(1, Cell, 'Q'),
+    get_cell(Board, NewRow, Column, BelowCell),
+    nth1(2, BelowCell, up),
+    !,
+    cell_empty(Board, NewRow, Column, left).
+
+check_below(Board, Row, Column) :-
+    NewRow is Row+1,
+    valid_coordinate(NewRow),
+    get_cell(Board, Row, Column, Cell),
+    nth1(1, Cell, 'Q'),
+    get_cell(Board, NewRow, Column, BelowCell),
+    !,
+    cell_empty(Board, NewRow, Column, right).
 
 check_below(Board, Row, Column) :-
     NewRow is Row+1,
@@ -178,9 +288,21 @@ check_below(Board, Row, Column) :-
     get_cell(Board, Row, Column, Cell),
     nth1(1, Cell, 'R'),
     get_cell(Board, NewRow, Column, BelowCell),
-    ite(nth1(1, BelowCell, 'Q'),
-        \+cell_empty(Board, NewRow, Column),
-        \+cell_empty(Board, NewRow, Column, right)).
+    (   nth1(1, BelowCell, 'Q')
+    ;   nth1(1, BelowCell, 'R')
+    ),
+    !,
+    cell_occupied(Board, NewRow, Column).
+
+check_below(Board, Row, Column) :-
+    NewRow is Row+1,
+    valid_coordinate(NewRow),
+    get_cell(Board, Row, Column, Cell),
+    nth1(1, Cell, 'R'),
+    get_cell(Board, NewRow, Column, BelowCell),
+    nth1(1, BelowCell, 'T'),
+    !,
+    cell_occupied(Board, NewRow, Column, right).
 
 check_below(Board, Row, Column) :-
     NewRow is Row+1,
@@ -189,14 +311,21 @@ check_below(Board, Row, Column) :-
     nth1(1, Cell, 'R'),
     get_cell(Board, NewRow, Column, BelowCell),
     nth1(1, BelowCell, 'R'),
-    \+ cell_empty(Board, NewRow, Column).
+    !,
+    cell_occupied(Board, NewRow, Column).
 
 check_left(Board, Row, Column, Side) :-
     NewColumn is Column-1,
     valid_coordinate(NewColumn),
-    ite(Side==left,
-        \+cell_empty(Board, Row, NewColumn),
-        \+cell_empty(Board, Row, Column, left)).
+    Side==left,
+    !,
+    cell_occupied(Board, Row, NewColumn).
+
+check_left(Board, Row, Column, Side) :-
+    NewColumn is Column-1,
+    valid_coordinate(NewColumn),
+    !,
+    cell_occupied(Board, NewRow, Column, left).
 
 check_left(Board, Row, Column) :-
     NewColumn is Column-1,
@@ -204,10 +333,18 @@ check_left(Board, Row, Column) :-
     get_cell(Board, Row, Column, Cell),
     nth1(1, Cell, 'Q'),
     get_cell(Board, Row, NewColumn, LeftCell),
-    ite(nth1(1, LeftCell, 'R'),
-        \+cell_empty(Board, Row, NewColumn),
-        \+cell_empty(Board, Row, NewColumn, right)).
+    nth1(1, LeftCell, 'R'),
+    !,
+    cell_occupied(Board, Row, NewColumn).
 
+check_left(Board, Row, Column) :-
+    NewColumn is Column-1,
+    valid_coordinate(NewColumn),
+    get_cell(Board, Row, Column, Cell),
+    nth1(1, Cell, 'Q'),
+    get_cell(Board, Row, NewColumn, LeftCell),
+    !,
+    cell_occupied(Board, Row, NewColumn, right).
 
 check_left(Board, Row, Column) :-
     NewColumn is Column-1,
@@ -215,16 +352,31 @@ check_left(Board, Row, Column) :-
     get_cell(Board, Row, Column, Cell),
     nth1(1, Cell, 'R'),
     get_cell(Board, Row, NewColumn, LeftCell),
-    ite((nth1(1, LeftCell, 'R');nth1(1, LeftCell, 'Q')),
-        \+cell_empty(Board, Row, NewColumn),
-        \+cell_empty(Board, Row, NewColumn, right)).
+    (nth1(1, LeftCell, 'R'); nth1(1, LeftCell, 'Q')),
+    !,
+    cell_occupied(Board, Row, NewColumn).
+
+check_left(Board, Row, Column) :-
+    NewColumn is Column-1,
+    valid_coordinate(NewColumn),
+    get_cell(Board, Row, Column, Cell),
+    nth1(1, Cell, 'R'),
+    get_cell(Board, Row, NewColumn, LeftCell),
+    !,
+    cell_occupied(Board, Row, NewColumn, right).
 
 check_right(Board, Row, Column, Side) :-
     NewColumn is Column+1,
     valid_coordinate(NewColumn),
-    ite(Side==right,
-        \+cell_empty(Board, Row, NewColumn),
-        \+cell_empty(Board, Row, Column, right)).
+    Side==right,
+    !,
+    cell_occupied(Board, Row, NewColumn).
+
+check_right(Board, Row, Column, _) :-
+    NewColumn is Column+1,
+    valid_coordinate(NewColumn),
+    !,
+    cell_occupied(Board, Row, NewColumn, right).
 
 check_right(Board, Row, Column) :-
     NewColumn is Column+1,
@@ -232,9 +384,19 @@ check_right(Board, Row, Column) :-
     get_cell(Board, Row, Column, Cell),
     nth1(1, Cell, 'Q'),
     get_cell(Board, Row, NewColumn, RightCell),
-    ite(nth1(1, RightCell, 'R'),
-        \+cell_empty(Board, Row, NewColumn),
-        \+cell_empty(Board, Row, NewColumn, left)).
+    nth1(1, RightCell, 'R'),
+    !,
+    cell_occupied(Board, Row, NewColumn).
+
+check_right(Board, Row, Column) :-
+    NewColumn is Column+1,
+    valid_coordinate(NewColumn),
+    get_cell(Board, Row, Column, Cell),
+    nth1(1, Cell, 'Q'),
+    get_cell(Board, Row, NewColumn, RightCell),
+    nth1(1, RightCell, 'R'),
+    !,
+    cell_occupied(Board, Row, NewColumn, left).
 
 check_right(Board, Row, Column) :-
     NewColumn is Column+1,
@@ -242,9 +404,19 @@ check_right(Board, Row, Column) :-
     get_cell(Board, Row, Column, Cell),
     nth1(1, Cell, 'R'),
     get_cell(Board, Row, NewColumn, RightCell),
-    ite((nth1(1, RightCell, 'R');nth1(1, RightCell, 'Q')),
-        \+cell_empty(Board, Row, NewColumn),
-        \+cell_empty(Board, Row, NewColumn, left)).
+    (nth1(1, RightCell, 'R');nth1(1, RightCell, 'Q')),
+    !,
+    cell_occupied(Board, Row, NewColumn).
+
+check_right(Board, Row, Column) :-
+    NewColumn is Column+1,
+    valid_coordinate(NewColumn),
+    get_cell(Board, Row, Column, Cell),
+    nth1(1, Cell, 'R'),
+    get_cell(Board, Row, NewColumn, RightCell),
+    (nth1(1, RightCell, 'R');nth1(1, RightCell, 'Q')),
+    !,
+    cell_occupied(Board, Row, NewColumn, left).
 
 valid_cell(Board, Row, Column, Side) :-
     get_cell(Board, Row, Column, Cell),
@@ -258,10 +430,10 @@ valid_cell(Board, Row, Column, Side) :-
 
 valid_cell(Board, Row, Column) :-
     cell_empty(Board, Row, Column),
-    (   check_above(Board, Row, Column)
-    ;   check_below(Board, Row, Column)
-    ;   check_left(Board, Row, Column)
-    ;   check_right(Board, Row, Column)
+    ((check_above(Board, Row, Column))
+    ;(check_below(Board, Row, Column))
+    ;(check_left(Board, Row, Column))
+    ;check_right(Board, Row, Column)
     ).
 
 check_single(Cell, Id, Player, List, Board, NewBoard, Row, Column) :-
@@ -269,15 +441,8 @@ check_single(Cell, Id, Player, List, Board, NewBoard, Row, Column) :-
         update_board_multiple(Player, List, Board, NewBoard),
         update_board_single(Player, Row, Column, Board, NewBoard)).
 
-valid_moves(Board, ListOfMoves) :-
-    aux_valid_moves(Board, [], ListOfMoves, 1).
-
-aux_valid_moves(_, AuxList, [AuxList|_], 11).
-
-aux_valid_moves(Board, AuxList, ListOfMoves, Row) :-
-    NewRow is Row+1,
-    findall(X-Y, valid_cell(Board, X, Y), AuxList),
-    aux_valid_moves(Board, AuxList, ListOfMoves, NewRow).
+valid_moves(Board, AuxList) :-
+    findall(X-Y, valid_cell(Board, X, Y), AuxList).
 
 %Prints the initial, empty board and then 
 %executes a play
