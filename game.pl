@@ -419,7 +419,7 @@ check_right(Board, Row, Column, Side) :-
     NewColumn is Column+1,
     valid_coordinate(NewColumn),
     Side==right,
-    get_cell(Board, Row, Column, RightCell),
+    get_cell(Board, Row, NewColumn, RightCell),
     (   nth1(1, RightCell, 'Q')
     ;   nth1(1, RightCell, 'R')
     ),
