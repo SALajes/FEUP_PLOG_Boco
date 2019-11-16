@@ -310,18 +310,30 @@ valid_side(Side) :-
     ;   Side==right
     ).
 
+%Checks if a coordinate is valid. That is, if its value 
+%is between 1 and 10
 valid_coordinate(Coord) :-
     between(1, 10, Coord).
 
+%Cells that are part of rectangle number 1
 rect1squares([[1, 2], [1, 3], [1, 4], [1, 5]]).
+%Cells that are part of rectangle number 2
 rect2squares([[1, 6], [1, 7], [1, 8], [1, 9], [1, 10]]).
+%Cells that are part of rectangle number 3
 rect3squares([[2, 10], [3, 10], [4, 10], [5, 10]]).
+%Cells that are part of rectangle number 4
 rect4squares([[6, 10], [7, 10], [8, 10], [9, 10], [10, 10]]).
+%Cells that are part of rectangle number 5
 rect5squares([[10, 9], [10, 8], [10, 7], [10, 6]]).
+%Cells that are part of rectangle number 6
 rect6squares([[10, 5], [10, 4], [10, 3], [10, 2], [10, 1]]).
+%Cells that are part of rectangle number 7
 rect7squares([[9, 1], [8, 1], [7, 1], [6, 1]]).
+%Cells that are part of rectangle number 8
 rect8squares([[5, 1], [4, 1], [3, 1], [2, 1], [1, 1]]).
 
+%Gets the list of squares that are part of rectangle with
+%identifier equal to Id
 get_rect_square_list(Id, List) :-
     (   it(Id is 1, rect1squares(List)), !
     ;   it(Id is 2, rect2squares(List)), !

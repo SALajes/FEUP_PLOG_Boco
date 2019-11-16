@@ -1,6 +1,6 @@
-%('R',x,i) -> R is a rectangle; x is the id (1 to 8); i is the owner (nill, pup or pdw)
+%('R',x,i) -> R is a rectangle; x is the id (1 to 8); i is the owner (nill, p1 or p2)
 %('Q', i) -> Q is a square; l is the row (up to 8); c the column (1 to 8); i is the owner (nill, p1 or p2)
-%('T', o, i, j) -> T is a triangle; o is the orientation ('/' or '\\'); i the ownership of the first triangle; j the ownership of the second
+%('T', o, i, j) -> T is a triangle; o is the orientation (up or dw); i the ownership of the first triangle (nill, p1 or p2); j the ownership of the second (nill, p1 or p2)
 
 bocoStructure([
     [['R',8,nill], ['R',1,nill],['R',1,nill],['R',1,nill],['R',1,nill], ['R',2,nill],['R',2,nill],['R',2,nill],['R',2,nill],['R',2,nill]],
