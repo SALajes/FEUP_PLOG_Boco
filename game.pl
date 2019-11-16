@@ -4,6 +4,199 @@
 display_game(Board) :-
     print_board(Board, 1).
 
+%Prints the initial, empty board and then 
+%executes a play
+play :-
+    bocoStructure(Board),
+    select_game_mode(GameMode),
+    display_game(Board),
+    first_execute_play(Board, p1, GameMode).
+
+%Player vs Player
+first_execute_play(Board, Player, GameMode) :-
+    GameMode=1,
+    ask_move(Board, [Row, Column, Side], Player),
+    get_cell(Board, Row, Column, Cell),
+    ite(is_rectangle(Cell, Id),
+        get_rect_square_list(Id, List),
+        !),
+    ite(valid_side(Side),
+        update_board_single(Player,
+                            Row,
+                            Column,
+                            Side,
+                            Board,
+                            NewBoard),
+        check_single(Cell,
+                     Id,
+                     Player,
+                     List,
+                     Board,
+                     NewBoard,
+                     Row,
+                     Column)),
+    print_board(NewBoard, 1),
+    ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
+    execute_play(NewBoard, NewPlayer, GameMode).
+
+%Player vs PC - predicate that lets the player make a move
+first_execute_play(Board, Player, GameMode) :-
+    GameMode=2,
+    Player=p1,
+    ask_move(Board, [Row, Column, Side], Player),
+    get_cell(Board, Row, Column, Cell),
+    ite(is_rectangle(Cell, Id),
+        get_rect_square_list(Id, List),
+        !),
+    ite(valid_side(Side),
+        update_board_single(Player,
+                            Row,
+                            Column,
+                            Side,
+                            Board,
+                            NewBoard),
+        check_single(Cell,
+                     Id,
+                     Player,
+                     List,
+                     Board,
+                     NewBoard,
+                     Row,
+                     Column)),
+    print_board(NewBoard, 1),
+    ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
+    execute_play(NewBoard, NewPlayer, GameMode).
+
+%Player vs PC - predicate that lets the PC make a move
+first_execute_play(Board, Player, GameMode) :-
+    GameMode=2,
+    Player=p2,
+    valid_moves(Board, [Row-Column|_]),
+    get_cell(Board, Row, Column, Cell),
+    ite(is_rectangle(Cell, Id),
+        get_rect_square_list(Id, List),
+        !),
+    ite(valid_side(Side),
+        update_board_single(Player,
+                            Row,
+                            Column,
+                            Side,
+                            Board,
+                            NewBoard),
+        check_single(Cell,
+                     Id,
+                     Player,
+                     List,
+                     Board,
+                     NewBoard,
+                     Row,
+                     Column)),
+    print_board(NewBoard, 1),
+    ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
+    execute_play(NewBoard, NewPlayer, GameMode).
+
+%PC vs Player - predicate that lets the PC make a move
+first_execute_play(Board, Player, GameMode) :-
+    GameMode=3,
+    Player=p1,
+    random_between(1, 10, Row),
+    random_between(1, 10, Column),
+    get_cell(Board, Row, Column, Cell),
+    ite(is_rectangle(Cell, Id),
+        get_rect_square_list(Id, List),
+        !),
+    ite(valid_side(Side),
+        update_board_single(Player,
+                            Row,
+                            Column,
+                            Side,
+                            Board,
+                            NewBoard),
+        check_single(Cell,
+                     Id,
+                     Player,
+                     List,
+                     Board,
+                     NewBoard,
+                     Row,
+                     Column)),
+    print_board(NewBoard, 1),
+    ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
+    execute_play(NewBoard, NewPlayer, GameMode).
+
+%PC vs Player - predicate that lets the Player make a move
+first_execute_play(Board, Player, GameMode) :-
+    GameMode=3,
+    Player=p2,
+    ask_move(Board, [Row, Column, Side], Player),
+    get_cell(Board, Row, Column, Cell),
+    ite(is_rectangle(Cell, Id),
+        get_rect_square_list(Id, List),
+        !),
+    ite(valid_side(Side),
+        update_board_single(Player,
+                            Row,
+                            Column,
+                            Side,
+                            Board,
+                            NewBoard),
+        check_single(Cell,
+                     Id,
+                     Player,
+                     List,
+                     Board,
+                     NewBoard,
+                     Row,
+                     Column)),
+    print_board(NewBoard, 1),
+    ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
+    execute_play(NewBoard, NewPlayer, GameMode).
+
+%PC vs PC
+first_execute_play(Board, Player, GameMode) :-
+    GameMode=4,
+    random_between(1, 10, Row),
+    random_between(1, 10, Column),
+    get_cell(Board, Row, Column, Cell),
+    ite(is_rectangle(Cell, Id),
+        get_rect_square_list(Id, List),
+        !),
+    ite(valid_side(Side),
+        update_board_single(Player,
+                            Row,
+                            Column,
+                            Side,
+                            Board,
+                            NewBoard),
+        check_single(Cell,
+                     Id,
+                     Player,
+                     List,
+                     Board,
+                     NewBoard,
+                     Row,
+                     Column)),
+    print_board(NewBoard, 1),
+    ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
+    execute_play(NewBoard, NewPlayer, GameMode).
+
+process_game_mode(GameMode) :-
+    repeat,
+    read(GameMode),
+    ite(between(1, 4, GameMode), !, print_invalid_value()).
+
+ask_game_mode(GameMode) :-
+    writeln("You can pick one of the following modes: "),
+    writeln("1. Player vs Player;"),
+    writeln("2. Player vs PC;"),
+    writeln("3. PC vs Player"),
+    writeln("4. PC vs PC"),
+    writeln("Please insert the number of the mode you want to play: "),
+    read(GameMode).
+
+select_game_mode(GameMode) :-
+    ask_game_mode(GameMode).
+
 %Checks if the side of the triangle the user inputted is valid
 process_triangle_cell(Side) :-
     repeat,
@@ -39,50 +232,41 @@ ask_move(Board, [Row, Column, Side], Player) :-
     ite(is_triangle(Cell), ask_triangle_side(Side), !).
 
 display_available_plays(Board, PlayList) :-
-    findall(X1-Y1, valid_cell(Board, X1, Y1), L1),
-    findall(X2-Y2, valid_cell(Board, X2, Y2, left), L2),
-    findall(X3-Y3, valid_cell(Board, X3, Y3, right), L3),
+    findall(X1-Y1,
+            valid_cell(Board, X1, Y1),
+            L1),
+    findall(X2-Y2,
+            valid_cell(Board, X2, Y2, left),
+            L2),
+    findall(X3-Y3,
+            valid_cell(Board, X3, Y3, right),
+            L3),
     append(L1, L2, AuxL1),
     append(AuxL1, L3, PlayList).
-
-first_execute_play(Board, Player) :-
-    ask_move(Board, [Row, Column, Side], Player),
-    get_cell(Board, Row, Column, Cell),
-    ite(is_rectangle(Cell, Id),
-        get_rect_square_list(Id, List),
-        !),
-    ite(valid_side(Side),
-        update_board_single(Player,
-                            Row,
-                            Column,
-                            Side,
-                            Board,
-                            NewBoard),
-        check_single(Cell,
-                     Id,
-                     Player,
-                     List,
-                     Board,
-                     NewBoard,
-                     Row,
-                     Column)),
-    print_board(NewBoard, 1),
-    ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
-    execute_play(NewBoard, NewPlayer).
 
 print_available_plays([]).
 
 print_available_plays([X-Y|T]) :-
-    write(X), write("-"), write(Y), nl,
+    write(X),
+    write("-"),
+    write(Y),
+    nl,
     print_available_plays(T).
 
-%Asks the player for a move, and then updates the board 
-%depending if the selected cell is a triangle or not.
-%After that, repeats.
-execute_play(Board, Player) :-
+%Player vs Player - lets Player make a move
+%Player vs PC - lets Player make a move
+execute_play(Board, Player, GameMode) :-
+    (   GameMode=1
+    ;   GameMode=2,
+        Player=p1
+    ;   GameMode=3,
+        Player=p2
+    ),
+    repeat,
     display_available_plays(Board, PlayList),
     print_available_plays(PlayList),
-    ask_move(Board, [Row, Column, Side], Player),
+    ask_move(Board, [Row, Column, Side], Player),!,
+    member(Row-Column, PlayList),
     get_cell(Board, Row, Column, Cell),
     ite(is_rectangle(Cell, Id),
         get_rect_square_list(Id, List),
@@ -104,7 +288,40 @@ execute_play(Board, Player) :-
                      Column)),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
-    execute_play(NewBoard, NewPlayer).
+    execute_play(NewBoard, NewPlayer, GameMode).
+
+%Player vs PC - lets PC make a move
+%PC vs Player - lets PC make a move
+execute_play(Board, Player, GameMode) :-
+    (   GameMode=2,
+        Player=p2
+    ;   GameMode=3,
+        Player=p1
+    ;   GameMode=4
+    ),
+    valid_moves(Board, [Row-Column|_]),
+    get_cell(Board, Row, Column, Cell),
+    ite(is_rectangle(Cell, Id),
+        get_rect_square_list(Id, List),
+        !),
+    ite(valid_side(Side),
+        update_board_single(Player,
+                            Row,
+                            Column,
+                            Side,
+                            Board,
+                            NewBoard),
+        check_single(Cell,
+                     Id,
+                     Player,
+                     List,
+                     Board,
+                     NewBoard,
+                     Row,
+                     Column)),
+    print_board(NewBoard, 1),
+    ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
+    execute_play(NewBoard, NewPlayer, GameMode).
 
 cell_empty(Board, Row, Column, Side) :-
     get_cell(Board, Row, Column, Cell),
@@ -503,138 +720,3 @@ valid_moves(Board, AuxList) :-
     findall(X-Y,
             valid_cell(Board, X, Y),
             AuxList).
-
-%Prints the initial, empty board and then 
-%executes a play
-play :-
-    bocoStructure(Board),
-    display_game(Board),
-    first_execute_play(Board, p1).
-
-teste(L) :-
-    findall(X-Y,
-            valid_cell(
-                       [ 
-                         [ ['R', 8, nill],
-                           ['R', 1, nill],
-                           ['R', 1, nill],
-                           ['R', 1, nill],
-                           ['R', 1, nill],
-                           ['R', 2, nill],
-                           ['R', 2, nill],
-                           ['R', 2, nill],
-                           ['R', 2, nill],
-                           ['R', 2, nill]
-                         ],
-                         
-                         [ ['R', 8, nill],
-                           ['Q', nill],
-                           ['T', dw, nill, nill],
-                           ['Q', nill],
-                           ['T', dw, nill, nill],
-                           ['Q', nill],
-                           ['T', dw, nill, nill],
-                           ['Q', nill],
-                           ['T', dw, nill, nill],
-                           ['R', 3, nill]
-                         ],
-                         
-                         [ ['R', 8, nill],
-                           ['T', up, nill, nill],
-                           ['Q', nill],
-                           ['T', up, nill, nill],
-                           ['Q', nill],
-                           ['T', up, nill, nill],
-                           ['Q', nill],
-                           ['T', up, nill, nill],
-                           ['Q', nill],
-                           ['R', 3, nill]
-                         ],
-                         
-                         [ ['R', 8, nill],
-                           ['Q', nill],
-                           ['T', dw, nill, nill],
-                           ['Q', p1],
-                           ['T', dw, p2, p1],
-                           ['Q', nill],
-                           ['T', dw, nill, nill],
-                           ['Q', nill],
-                           ['T', dw, nill, nill],
-                           ['R', 3, nill]
-                         ],
-                         
-                         [ ['R', 8, nill],
-                           ['T', up, nill, nill],
-                           ['Q', nill],
-                           ['T', up, p2, p1],
-                           ['Q', nill],
-                           ['T', up, nill, nill],
-                           ['Q', nill],
-                           ['T', up, nill, nill],
-                           ['Q', nill],
-                           ['R', 3, nill]
-                         ],
-                         
-                         [ ['R', 7, nill],
-                           ['Q', nill],
-                           ['T', dw, nill, nill],
-                           ['Q', p2],
-                           ['T', dw, p1, p2],
-                           ['Q', nill],
-                           ['T', dw, nill, nill],
-                           ['Q', nill],
-                           ['T', dw, nill, nill],
-                           ['R', 4, nill]
-                         ],
-                         
-                         [ ['R', 7, nill],
-                           ['T', up, nill, nill],
-                           ['Q', nill],
-                           ['T', up, nill, nill],
-                           ['Q', p1],
-                           ['T', up, nill, nill],
-                           ['Q', nill],
-                           ['T', up, nill, nill],
-                           ['Q', nill],
-                           ['R', 4, nill]
-                         ],
-                         
-                         [ ['R', 7, nill],
-                           ['Q', nill],
-                           ['T', dw, nill, nill],
-                           ['Q', nill],
-                           ['T', dw, nill, nill],
-                           ['Q', nill],
-                           ['T', dw, nill, nill],
-                           ['Q', nill],
-                           ['T', dw, nill, nill],
-                           ['R', 4, nill]
-                         ],
-                         
-                         [ ['R', 7, nill],
-                           ['T', up, nill, nill],
-                           ['Q', nill],
-                           ['T', up, nill, nill],
-                           ['Q', nill],
-                           ['T', up, nill, nill],
-                           ['Q', nill],
-                           ['T', up, nill, nill],
-                           ['Q', nill],
-                           ['R', 4, nill]
-                         ],
-                         
-                         [ ['R', 6, nill],
-                           ['R', 6, nill],
-                           ['R', 6, nill],
-                           ['R', 6, nill],
-                           ['R', 6, nill],
-                           ['R', 5, nill],
-                           ['R', 5, nill],
-                           ['R', 5, nill],
-                           ['R', 5, nill],
-                           ['R', 4, nill]
-                         ]
-                       ],
-                       X,
-                       Y, left),
-            L).
