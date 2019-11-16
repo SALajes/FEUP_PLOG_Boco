@@ -71,7 +71,8 @@ first_execute_play(Board, Player, GameMode) :-
 first_execute_play(Board, Player, GameMode) :-
     GameMode=2,
     Player=p2,
-    valid_moves(Board, [Row-Column|_]),
+    repeat,
+    available_plays(Board, [Row-Column-Side|_]),
     get_cell(Board, Row, Column, Cell),
     ite(is_rectangle(Cell, Id),
         get_rect_square_list(Id, List),
@@ -231,14 +232,14 @@ ask_move(Board, [Row, Column, Side], Player) :-
     get_cell(Board, Row, Column, Cell),
     ite(is_triangle(Cell), ask_triangle_side(Side), !).
 
-display_available_plays(Board, PlayList) :-
+available_plays(Board, PlayList) :-
     findall(X1-Y1,
             valid_cell(Board, X1, Y1),
             L1),
-    findall(X2-Y2,
+    findall(X2-Y2-left,
             valid_cell(Board, X2, Y2, left),
             L2),
-    findall(X3-Y3,
+    findall(X3-Y3-right,
             valid_cell(Board, X3, Y3, right),
             L3),
     append(L1, L2, AuxL1),
@@ -253,6 +254,14 @@ print_available_plays([X-Y|T]) :-
     nl,
     print_available_plays(T).
 
+valid_play(Board, Player, Row, Column, Side) :-
+    repeat,
+    available_plays(Board, PlayList),
+    writeln("Available plays:"),
+    print_available_plays(PlayList),
+    ask_move(Board, [Row, Column, Side], Player),!,
+    (member(Row-Column, PlayList);member(Row-Column-Side, PlayList)).
+
 %Player vs Player - lets Player make a move
 %Player vs PC - lets Player make a move
 execute_play(Board, Player, GameMode) :-
@@ -262,11 +271,7 @@ execute_play(Board, Player, GameMode) :-
     ;   GameMode=3,
         Player=p2
     ),
-    repeat,
-    display_available_plays(Board, PlayList),
-    print_available_plays(PlayList),
-    ask_move(Board, [Row, Column, Side], Player),!,
-    member(Row-Column, PlayList),
+    valid_play(Board, Player, Row, Column, Side),
     get_cell(Board, Row, Column, Cell),
     ite(is_rectangle(Cell, Id),
         get_rect_square_list(Id, List),
@@ -299,7 +304,7 @@ execute_play(Board, Player, GameMode) :-
         Player=p1
     ;   GameMode=4
     ),
-    valid_moves(Board, [Row-Column|_]),
+    (available_plays(Board, [Row-Column-Side|_]);available_plays(Board, [Row-Column|_])),
     get_cell(Board, Row, Column, Cell),
     ite(is_rectangle(Cell, Id),
         get_rect_square_list(Id, List),
@@ -715,8 +720,3 @@ check_single(Cell, Id, Player, List, Board, NewBoard, Row, Column) :-
     ite(is_rectangle(Cell, Id),
         update_board_multiple(Player, List, Board, NewBoard),
         update_board_single(Player, Row, Column, Board, NewBoard)).
-
-valid_moves(Board, AuxList) :-
-    findall(X-Y,
-            valid_cell(Board, X, Y),
-            AuxList).
