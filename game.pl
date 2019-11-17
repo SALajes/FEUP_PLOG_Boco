@@ -13,13 +13,12 @@ play :-
     bocoStructure(Board),
     select_game_mode(GameMode),
     display_game(Board),
-    first_execute_play(Board, p1, GameMode).
+    first_move(Board, p1, GameMode).
 
 %Player vs Player
 %Executes the first play of the game in a Player vs Player
 %game mode, by either player 1 or player 2
-first_execute_play(Board, Player, GameMode) :-
-    cls(),
+first_move(Board, Player, GameMode) :-
     GameMode=1,
     ask_move(Board, [Row, Column, Side], Player),
     get_cell(Board, Row, Column, Cell),
@@ -41,16 +40,15 @@ first_execute_play(Board, Player, GameMode) :-
                      NewBoard,
                      Row,
                      Column)),
+    cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
-    cls(),
-    execute_play(NewBoard, NewPlayer, GameMode).
+    move(NewBoard, NewPlayer, GameMode).
 
 %Player vs PC - predicate that lets the player make a move
 %Executes the first play of the game in a Player vs PC
 % game mode, by player 1
-first_execute_play(Board, Player, GameMode) :-
-    cls(),
+first_move(Board, Player, GameMode) :-
     GameMode=2,
     Player=p1,
     ask_move(Board, [Row, Column, Side], Player),
@@ -73,20 +71,19 @@ first_execute_play(Board, Player, GameMode) :-
                      NewBoard,
                      Row,
                      Column)),
+    cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
-    cls(),
-    execute_play(NewBoard, NewPlayer, GameMode).
+    move(NewBoard, NewPlayer, GameMode).
 
 %Player vs PC - predicate that lets the PC make a move
 %Executes the first play of the game in a Player vs PC
 % game mode, by player 2
-first_execute_play(Board, Player, GameMode) :-
-    cls(),
+first_move(Board, Player, GameMode) :-
     GameMode=2,
     Player=p2,
     repeat,
-    available_plays(Board, [Row-Column-Side|_]),
+    valid_moves(Board, [Row-Column-Side|_]),
     get_cell(Board, Row, Column, Cell),
     ite(is_rectangle(Cell, Id),
         get_rect_square_list(Id, List),
@@ -106,16 +103,15 @@ first_execute_play(Board, Player, GameMode) :-
                      NewBoard,
                      Row,
                      Column)),
+    cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
-    cls(),
-    execute_play(NewBoard, NewPlayer, GameMode).
+    move(NewBoard, NewPlayer, GameMode).
 
 %PC vs Player - predicate that lets the PC make a move
 %Executes the first play of the game in a PC vs Player
 % game mode, by player 1
-first_execute_play(Board, Player, GameMode) :-
-    cls(),
+first_move(Board, Player, GameMode) :-
     GameMode=3,
     Player=p1,
     random_between(1, 10, Row),
@@ -139,16 +135,15 @@ first_execute_play(Board, Player, GameMode) :-
                      NewBoard,
                      Row,
                      Column)),
+    cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
-    cls(),
-    execute_play(NewBoard, NewPlayer, GameMode).
+    move(NewBoard, NewPlayer, GameMode).
 
 %PC vs Player - predicate that lets the Player make a move
 %Executes the first play of the game in a PC vs Player
 % game mode, by player 2
-first_execute_play(Board, Player, GameMode) :-
-    cls(),
+first_move(Board, Player, GameMode) :-
     GameMode=3,
     Player=p2,
     ask_move(Board, [Row, Column, Side], Player),
@@ -171,16 +166,15 @@ first_execute_play(Board, Player, GameMode) :-
                      NewBoard,
                      Row,
                      Column)),
+    cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
-    cls(),
-    execute_play(NewBoard, NewPlayer, GameMode).
+    move(NewBoard, NewPlayer, GameMode).
 
 %PC vs PC
 %Executes the first play of the game in a PC vs PC
 %game mode, by either Player 1 or Player 2
-first_execute_play(Board, Player, GameMode) :-
-    cls(),
+first_move(Board, Player, GameMode) :-
     GameMode=4,
     random_between(1, 10, Row),
     random_between(1, 10, Column),
@@ -203,11 +197,11 @@ first_execute_play(Board, Player, GameMode) :-
                      NewBoard,
                      Row,
                      Column)),
+    cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
     sleep(1),
-    cls(),
-    execute_play(NewBoard, NewPlayer, GameMode).
+    move(NewBoard, NewPlayer, GameMode).
 
 %Checks if the game mode inserted by the user is one of the 4 valid ones
 process_game_mode(GameMode) :-
@@ -265,7 +259,7 @@ ask_move(Board, [Row, Column, Side], Player) :-
 %Lists all available plays on the board. A valid (and, therefore, 
 %available) play is one where the selected cell is empty, and has 
 %at least one filled adjacent cell
-available_plays(Board, PlayList) :-
+valid_moves(Board, PlayList) :-
     findall(X1-Y1,
             valid_cell(Board, X1, Y1),
             L1),
@@ -279,15 +273,15 @@ available_plays(Board, PlayList) :-
     append(AuxL1, L3, PlayList).
 
 %Stops printing available plays when the list is empty
-print_available_plays([]).
+print_valid_moves([]).
 
 %Prints every available play in the format Row-Column
-print_available_plays([X-Y|T]) :-
+print_valid_moves([X-Y|T]) :-
     write(X),
     write("-"),
     write(Y),
     nl,
-    print_available_plays(T).
+    print_valid_moves(T).
 
 %Checks if a play inserted by the user is valid.
 %To be valid, the coordinates of the cell selected 
@@ -295,9 +289,9 @@ print_available_plays([X-Y|T]) :-
 %called PlayList.
 valid_play(Board, Player, Row, Column, Side) :-
     repeat,
-    available_plays(Board, PlayList),
+    valid_moves(Board, PlayList),
     writeln("Available plays:"),
-    print_available_plays(PlayList),
+    print_valid_moves(PlayList),
     ask_move(Board, [Row, Column, Side], Player),!,
     (member(Row-Column, PlayList);member(Row-Column-Side, PlayList)).
 
@@ -308,7 +302,7 @@ valid_play(Board, Player, Row, Column, Side) :-
 %-Game mode is Player vs Player
 %-Game mode is Player vs PC and it's the Player's turn to play
 %-Game mode is PC vs Player and it's the Player's turn to play
-execute_play(Board, Player, GameMode) :-
+move(Board, Player, GameMode) :-
     (   GameMode=1
     ;   GameMode=2,
         Player=p1
@@ -335,11 +329,11 @@ execute_play(Board, Player, GameMode) :-
                      NewBoard,
                      Row,
                      Column)),
+    cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
     sleep(1),
-    cls(),
-    execute_play(NewBoard, NewPlayer, GameMode).
+    move(NewBoard, NewPlayer, GameMode).
 
 %Player vs PC - lets PC make a move
 %PC vs Player - lets PC make a move
@@ -348,14 +342,14 @@ execute_play(Board, Player, GameMode) :-
 %-Game mode is Player vs PC
 %-Game mode is PC vs Player and it's the PC's turn to play
 %-Game mode is PC vs PC 
-execute_play(Board, Player, GameMode) :-
+move(Board, Player, GameMode) :-
     (   GameMode=2,
         Player=p2
     ;   GameMode=3,
         Player=p1
     ;   GameMode=4
     ),
-    (available_plays(Board, [Row-Column-Side|_]);available_plays(Board, [Row-Column|_])),
+    choose_move(Board, Row, Column, Side),
     get_cell(Board, Row, Column, Cell),
     ite(is_rectangle(Cell, Id),
         get_rect_square_list(Id, List),
@@ -375,11 +369,14 @@ execute_play(Board, Player, GameMode) :-
                      NewBoard,
                      Row,
                      Column)),
+    cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
     sleep(1),
-    cls(),
-    execute_play(NewBoard, NewPlayer, GameMode).
+    move(NewBoard, NewPlayer, GameMode).
+
+choose_move(Board, Row, Column, Side) :-
+    (valid_moves(Board, [Row-Column-Side|_]);valid_moves(Board, [Row-Column|_])).
 
 %Checks if a triangle cell, on a certain side (left or right) is empty
 cell_empty(Board, Row, Column, Side) :-
