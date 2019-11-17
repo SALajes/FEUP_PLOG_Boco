@@ -40,7 +40,7 @@ first_move(Board, Player, GameMode) :-
                      NewBoard,
                      Row,
                      Column)),
-    cls(),
+    %cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
     move(NewBoard, NewPlayer, GameMode).
@@ -71,7 +71,7 @@ first_move(Board, Player, GameMode) :-
                      NewBoard,
                      Row,
                      Column)),
-    cls(),
+    %cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
     move(NewBoard, NewPlayer, GameMode).
@@ -103,7 +103,7 @@ first_move(Board, Player, GameMode) :-
                      NewBoard,
                      Row,
                      Column)),
-    cls(),
+    %cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
     move(NewBoard, NewPlayer, GameMode).
@@ -135,7 +135,7 @@ first_move(Board, Player, GameMode) :-
                      NewBoard,
                      Row,
                      Column)),
-    cls(),
+    %cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
     move(NewBoard, NewPlayer, GameMode).
@@ -166,7 +166,7 @@ first_move(Board, Player, GameMode) :-
                      NewBoard,
                      Row,
                      Column)),
-    cls(),
+    %cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
     move(NewBoard, NewPlayer, GameMode).
@@ -197,7 +197,7 @@ first_move(Board, Player, GameMode) :-
                      NewBoard,
                      Row,
                      Column)),
-    cls(),
+    %cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
     sleep(1),
@@ -311,7 +311,7 @@ move(Board, Player, GameMode) :-
     ),
     valid_play(Board, Player, Row, Column, Side),
     update_board(Player, Row, Column, Side, Board, NewBoard),
-    cls(),
+    %cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
     sleep(1),
@@ -333,7 +333,7 @@ move(Board, Player, GameMode) :-
     ),
     choose_move(Board, Row, Column, Side),
     update_board(Player, Row, Column, Side, Board, NewBoard),
-    cls(),
+    %cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
     sleep(1),
@@ -405,6 +405,26 @@ cell_occupied(Board, Row, Column) :-
     ;   nth1(2, Cell, p2)
     ).
 
+%Checks if a rectangle cell is occupied
+cell_occupied(Board, Row, Column, _) :-
+    valid_coordinate(Row),
+    valid_coordinate(Column),
+    get_cell(Board, Row, Column, Cell),
+    nth1(1, Cell, 'R'),
+    (   nth1(3, Cell, p1)
+    ;   nth1(3, Cell, p2)
+    ).
+    
+%Checks if a square cell is occupied
+cell_occupied(Board, Row, Column, _) :-
+    valid_coordinate(Row),
+    valid_coordinate(Column),
+    get_cell(Board, Row, Column, Cell),
+    nth1(1, Cell, 'Q'),
+    (   nth1(2, Cell, p1)
+    ;   nth1(2, Cell, p2)
+    ).
+
 %Checks if a triangle cell, on a certain side, is occupied
 cell_occupied(Board, Row, Column, Side) :-
     valid_coordinate(Row),
@@ -450,7 +470,7 @@ check_above(Board, Row, Column, Side) :-
     get_cell(Board, Row, Column, Cell),
     nth1(2, Cell, dw),
     Side==right,
-    get_cell(Board, Row, Column, AboveCell),
+    get_cell(Board, NewRow, Column, AboveCell),
     (   nth1(1, AboveCell, 'R')
     ;   nth1(1, AboveCell, 'Q')
     ),
@@ -492,7 +512,7 @@ check_above(Board, Row, Column) :-
     get_cell(Board, Row, Column, Cell),
     nth1(1, Cell, 'Q'),
     get_cell(Board, NewRow, Column, AboveCell),
-    nth1(2, AboveCell, down),
+    nth1(2, AboveCell, dw),
     cell_occupied(Board, NewRow, Column, left).
 
 %If selected cell is rectangle, checks if above cell is rectangle
@@ -522,7 +542,7 @@ check_above(Board, Row, Column) :-
     get_cell(Board, Row, Column, Cell),
     nth1(1, Cell, 'R'),
     get_cell(Board, NewRow, Column, AboveCell),
-    nth1(2, AboveCell, down),
+    nth1(2, AboveCell, dw),
     cell_occupied(Board, NewRow, Column, right).
 
 %If selected cell is up triangle right side, checks if down cell is rectangle or square
