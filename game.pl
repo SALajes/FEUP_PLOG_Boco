@@ -310,25 +310,7 @@ move(Board, Player, GameMode) :-
         Player=p2
     ),
     valid_play(Board, Player, Row, Column, Side),
-    get_cell(Board, Row, Column, Cell),
-    ite(is_rectangle(Cell, Id),
-        get_rect_square_list(Id, List),
-        !),
-    ite(valid_side(Side),
-        update_board_single(Player,
-                            Row,
-                            Column,
-                            Side,
-                            Board,
-                            NewBoard),
-        check_single(Cell,
-                     Id,
-                     Player,
-                     List,
-                     Board,
-                     NewBoard,
-                     Row,
-                     Column)),
+    update_board(Player, Row, Column, Side, Board, NewBoard),
     cls(),
     print_board(NewBoard, 1),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
@@ -350,6 +332,17 @@ move(Board, Player, GameMode) :-
     ;   GameMode=4
     ),
     choose_move(Board, Row, Column, Side),
+    update_board(Player, Row, Column, Side, Board, NewBoard),
+    cls(),
+    print_board(NewBoard, 1),
+    ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
+    sleep(1),
+    move(NewBoard, NewPlayer, GameMode).
+
+choose_move(Board, Row, Column, Side) :-
+    (valid_moves(Board, [Row-Column-Side|_]);valid_moves(Board, [Row-Column|_])).
+
+update_board(Player, Row, Column, Side, Board, NewBoard) :-
     get_cell(Board, Row, Column, Cell),
     ite(is_rectangle(Cell, Id),
         get_rect_square_list(Id, List),
@@ -368,15 +361,7 @@ move(Board, Player, GameMode) :-
                      Board,
                      NewBoard,
                      Row,
-                     Column)),
-    cls(),
-    print_board(NewBoard, 1),
-    ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
-    sleep(1),
-    move(NewBoard, NewPlayer, GameMode).
-
-choose_move(Board, Row, Column, Side) :-
-    (valid_moves(Board, [Row-Column-Side|_]);valid_moves(Board, [Row-Column|_])).
+                     Column)).
 
 %Checks if a triangle cell, on a certain side (left or right) is empty
 cell_empty(Board, Row, Column, Side) :-
