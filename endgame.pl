@@ -86,10 +86,10 @@ playerLost(Board, Coordinates, Player, VerifiedCells, Result):- %player chose a 
     checkCell(Board, Coordinates, Player, VerifiedCells, IntermediateResult),
     didPlayerLose(IntermediateResult, Result).
 
-didPlayerLose(IntermediateResult, lost):-
-    IntermediateResult \= notLost.
+didPlayerLose(IntermediateResult, notLost):-
+    IntermediateResult == notLost.
 
-didPlayerLose(notLost, notLost).
+didPlayerLose(_, lost).
 
 
 %CHECK CELL
@@ -102,13 +102,13 @@ checkCell(Board, Coordinates, Player, VerifiedCells, Result):-
 
 
 % ANALYSE NEIGHBOURS
-analyseNeighbours(notLost, _, _, _, _, notLost):- !.
+analyseNeighbours(notLost, _, _, _, _, notLost):- !. % player did not lose
 
-analyseNeighbours(_, _, _, _, [], _) :- !.
+analyseNeighbours(_, _, _, _, [], _) :- !. %nothing can be concluded
 
-analyseNeighbours(_, Board, Player, VerifiedCells, [H|T], Result):-
-    checkCell(Board, H, Player, VerifiedCells, IntermediateResult),
-    analyseNeighbours(IntermediateResult, Board, Player, VerifiedCells, T, Result),
+analyseNeighbours(_, Board, Player, VerifiedCells, [H|T], Result):- %more neighbours to analyse
+    checkCell(Board, H, Player, VerifiedCells, IntermediateResult), %analyse first head neighbour of the list
+    analyseNeighbours(IntermediateResult, Board, Player, VerifiedCells, T, Result), %recursive call
     !.
 
 %---------- NEIGHBOURING ----------%
