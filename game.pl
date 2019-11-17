@@ -313,6 +313,8 @@ move(Board, Player, GameMode) :-
     update_board(Player, Row, Column, Side, Board, NewBoard),
     %cls(),
     print_board(NewBoard, 1),
+    %get_cell(NewBoard, Row, Column, Cell),
+    %game_over(Board, Cell, Row, Column, Side, Player, Finish),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
     sleep(1),
     move(NewBoard, NewPlayer, GameMode).
@@ -335,6 +337,8 @@ move(Board, Player, GameMode) :-
     update_board(Player, Row, Column, Side, Board, NewBoard),
     %cls(),
     print_board(NewBoard, 1),
+    %get_cell(NewBoard, Row, Column, Cell),
+    %game_over(Board, Cell, Row, Column, Side, Player, Finish),
     ite(Player==p1, NewPlayer=p2, NewPlayer=p1),
     sleep(1),
     move(NewBoard, NewPlayer, GameMode).
